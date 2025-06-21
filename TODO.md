@@ -1,0 +1,21 @@
+# TODO
+
+- CLI
+  - [x] `memo add "Note Title" "content"`
+    - [ ] Should fail if title exists
+  - [ ] `memo add "Note Title"` with pipe editor
+  - [x] `memo ls`
+    - [ ] Needs single line formatting
+    - [ ] Needs fancy/notfancy flag
+    - [ ] `memo ls --label "label" -l "label"`
+  - [x] `memo label add "label" INDX`
+  - [x] `memo labels`
+  - [x] `memo label rm "label" INDX`
+  - [ ] `memo search [--title --content] search_term [--short --full]`
+  - [ ] Editing
+- [ ] Config
+    - .dotenv for env vars?
+    - `~/.config`?
+    - ENV VARS for save folder
+- [ ] Help menu
+- [ ] Convert saves_dir to app config
