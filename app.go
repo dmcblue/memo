@@ -15,6 +15,23 @@ func AddMemo(ui *Ui) {
 		cliError("No memo title given")
 	}
 	title := strings.TrimSpace(os.Args[2])
+
+	memos := LoadMemos(saves_dir)
+	for _, memo := range memos {
+		if memo.Title == title {
+			response := ui.GetResponse(
+				fmt.Sprintf("Memo '%s' already exists.\nEdit? (y/n) ", title),
+				"Invalid response. Try again: ",
+				[]string{"y", "n"},
+			)
+			if response == "y" {
+				EditMemo(ui) // inefficient but simple
+			}
+
+			return
+		}
+	}
+
 	var content string
 	if len(os.Args) < 4 {
 		content = ui.EditContent("")

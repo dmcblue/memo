@@ -2,7 +2,7 @@
 
 - CLI
   - [x] `memo add "Note Title" "content"`
-    - [ ] Should fail if title exists
+    - [x] Should fail if title exists
   - [x] `memo add "Note Title"` with pipe editor
   - [x] `memo ls`
     - [ ] Needs single line formatting
