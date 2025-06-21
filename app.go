@@ -10,14 +10,14 @@ import (
  * Memos *
  *********/
 
-func AddMemo() {
+func AddMemo(ui *Ui) {
 	if len(os.Args) < 3 {
 		cliError("No memo title given")
 	}
 	title := strings.TrimSpace(os.Args[2])
 	var content string
 	if len(os.Args) < 4 {
-
+		content = ui.EditContent("")
 	} else {
 		content = strings.TrimSpace(os.Args[3])
 	}

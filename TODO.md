@@ -3,7 +3,7 @@
 - CLI
   - [x] `memo add "Note Title" "content"`
     - [ ] Should fail if title exists
-  - [ ] `memo add "Note Title"` with pipe editor
+  - [x] `memo add "Note Title"` with pipe editor
   - [x] `memo ls`
     - [ ] Needs single line formatting
     - [ ] Needs fancy/notfancy flag

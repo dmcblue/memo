@@ -3,8 +3,10 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"math"
 	"os"
+	"os/exec"
 	"slices"
 	"strconv"
 	"strings"
@@ -103,6 +105,49 @@ func (ui *Ui) GetMultilineText(prompt string, doneText string) string {
 /*********
  * Memos *
  *********/
+
+// https://github.com/msemjan/go-external-editor/blob/9e2e6ee617d8dcb9a41a86e49282170327ba524d/main.go#L22C2-L66C3
+func (ui *Ui) EditContent(fileContents string) string {
+	// Create a temporary file
+	f, err1 := os.CreateTemp("", "memo-*")
+	if err1 != nil {
+		log.Fatal(err1)
+	}
+	defer f.Close()
+	defer os.Remove(f.Name())
+
+	// Fill the termporary file with some data
+	f.WriteString(fileContents)
+
+	// Open the temporary file in Vim for editing
+	editor := strings.TrimSpace(os.Getenv("EDITOR"))
+	cmd := exec.Command(editor, f.Name())
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	// Open the temporary file in an external editor
+	err2 := cmd.Start()
+	if err2 != nil {
+		log.Printf("2")
+		log.Fatal(err2)
+	}
+
+	// Wait for the user to do their thing...
+	err2 = cmd.Wait()
+
+	// Check if they didn't mess up everything
+	if err2 != nil {
+		log.Printf("Error while editing. Error: %v\n", err2)
+	}
+
+	content, err := os.ReadFile(f.Name())
+	if err != nil {
+		fmt.Println("Err")
+	}
+
+	return string(content)
+}
 
 func (ui *Ui) PrintMemos(memos map[string]*Memo) {
 	width := GetTermWidth()

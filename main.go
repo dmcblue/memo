@@ -43,7 +43,7 @@ func main() {
 	command := strings.TrimSpace(os.Args[1])
 	switch command {
 	case "add":
-		AddMemo()
+		AddMemo(ui)
 	case "label":
 		if len(os.Args) < 3 {
 			cliError("No arguments given")
