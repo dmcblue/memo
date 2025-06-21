@@ -44,6 +44,8 @@ func main() {
 	switch command {
 	case "add":
 		AddMemo(ui)
+	case "edit":
+		EditMemo(ui)
 	case "label":
 		if len(os.Args) < 3 {
 			cliError("No arguments given")

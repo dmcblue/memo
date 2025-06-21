@@ -12,7 +12,10 @@
   - [x] `memo labels`
   - [x] `memo label rm "label" INDX`
   - [ ] `memo search [--title --content] search_term [--short --full]`
-  - [ ] Editing
+  - [x] Editing
+    -  `memo edit (INDX or title) [CONTENT]`
+    - [ ] Add edit diff
+  - [ ] Show single memo
 - [ ] Config
     - .dotenv for env vars?
     - `~/.config`?

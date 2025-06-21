@@ -28,6 +28,36 @@ func AddMemo(ui *Ui) {
 	}
 }
 
+func EditMemo(ui *Ui) {
+	if len(os.Args) < 3 {
+		cliError("No memo hash/title given")
+	}
+
+	identifier := strings.TrimSpace(os.Args[2])
+	memos := LoadMemos(saves_dir)
+	var memo_to_edit *Memo = nil
+	for hash, memo := range memos {
+		if hash[0:8] == identifier || memo.Title == identifier {
+			memo_to_edit = memo
+			break
+		}
+	}
+
+	if memo_to_edit == nil {
+		cliError(fmt.Sprintf("Unknown memo identifier '%s'\n", identifier))
+	}
+
+	var new_content string
+	if len(os.Args) < 4 {
+		new_content = ui.EditContent(memo_to_edit.Content)
+	} else {
+		new_content = strings.TrimSpace(os.Args[3])
+	}
+
+	memo_to_edit.Content = new_content
+	memo_to_edit.Save(saves_dir)
+}
+
 func ShowMemos(ui *Ui) {
 	search_labels_map := make(map[string]bool)
 	for i := 2; i < len(os.Args); i++ {
