@@ -9,10 +9,10 @@
     - [x] Needs single line formatting
     - [x] Needs fancy/notfancy flag
     - [x] Tabs
-    - [x] `memo ls --label "label" -l "label"`
-  - [x] `memo label add "label" INDX`
-  - [x] `memo labels`
-  - [x] `memo label rm "label" INDX`
+    - [x] `memo ls --tag "tag" -l "tag"`
+  - [x] `memo tag add "tag" INDX`
+  - [x] `memo tags`
+  - [x] `memo tag rm "tag" INDX`
   - [ ] `memo search [--title --content] search_term [--short --full]`
   - [x] Editing
     -  `memo edit (INDX or title) [CONTENT]`
@@ -28,6 +28,8 @@
 - [x] Help menu
   - [x] Chunk strings
 - [x] Convert saves_dir to app config
-- [ ] Change 'label' to 'tag'
+- [x] Change 'label' to 'tag'
 - [x] ls, remove headers on no format
-- [x] labels, sort results alphabetically
+- [x] tags, sort results alphabetically
+- [ ] app version
+- [x] add returns index

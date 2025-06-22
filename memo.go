@@ -11,7 +11,7 @@ import (
 type Memo struct {
 	Title   string
 	Content string
-	Labels  []string
+	Tags    []string
 }
 
 const (
@@ -24,18 +24,20 @@ func CreateMemo(title string, content string) *Memo {
 	return &Memo{
 		Title:   title,
 		Content: content,
-		Labels:  []string{},
+		Tags:    []string{},
 	}
 }
 
-func (memo *Memo) Save(saves_dir string) error {
+func (memo *Memo) Save(saves_dir string) string {
 	filename := ToFilename(memo.Title, "")
 	fullpath := filepath.Join(
 		saves_dir,
 		filename,
 	)
 
-	return ToJson(memo, fullpath)
+	ToJson(memo, fullpath)
+	hash := sha1.Sum([]byte(filename))
+	return fmt.Sprintf("%x", hash)
 }
 
 func LoadMemo(filename string, memo *Memo, saves_dir string) {

@@ -163,34 +163,34 @@ func (ui *Ui) PrintMemos(memos map[string]*Memo, skip_formatting bool) {
 		// sha 8 + 4 space + title + 4 space + content
 		var max_title_length float64 = 0
 		var max_content_length float64 = 0
-		var max_label_length float64 = 0
+		var max_tag_length float64 = 0
 		for _, memo := range memos {
 			max_title_length = math.Max(max_title_length, float64(len(memo.Title)))
 			max_content_length = math.Max(max_content_length, LongestOfMultiline(memo.Content))
-			for _, label := range memo.Labels {
-				max_label_length = math.Max(max_label_length, float64(len(label)))
+			for _, tag := range memo.Tags {
+				max_tag_length = math.Max(max_tag_length, float64(len(tag)))
 			}
 		}
 		title_memo := &Memo{
 			Title:   "TITLE",
 			Content: "CONTENT",
-			Labels:  []string{"LABELS"},
+			Tags:    []string{"TAGS"},
 		}
 		max_title_length = math.Max(max_title_length, float64(len(title_memo.Title)))
 		max_content_length = math.Max(max_content_length, LongestOfMultiline(title_memo.Content))
-		max_label_length = math.Max(max_label_length, float64(len(title_memo.Labels[0])))
+		max_tag_length = math.Max(max_tag_length, float64(len(title_memo.Tags[0])))
 
 		title_length := int(math.Min(max_title_length, float64((width-20)/3)))
-		label_width := int(max_label_length)
-		content_length := int(math.Min(max_content_length, float64(width-20-title_length-label_width-1))) // 1 for right side padding
-		// If there's extra room, expand labels
-		label_width = width - content_length - 20 - title_length - 1
+		tag_width := int(max_tag_length)
+		content_length := int(math.Min(max_content_length, float64(width-20-title_length-tag_width-1))) // 1 for right side padding
+		// If there's extra room, expand tags
+		tag_width = width - content_length - 20 - title_length - 1
 		ui.PrintMemoFancy(
 			"HASH    ",
 			title_memo,
 			title_length,
 			content_length,
-			label_width,
+			tag_width,
 		)
 		fmt.Println()
 
@@ -210,18 +210,18 @@ func (ui *Ui) PrintMemos(memos map[string]*Memo, skip_formatting bool) {
 				memo,
 				title_length,
 				content_length,
-				label_width,
+				tag_width,
 			)
 			fmt.Println()
 		}
 	}
 }
 
-func (ui *Ui) PrintMemoFancy(hash string, memo *Memo, title_length int, content_length int, label_length int) {
+func (ui *Ui) PrintMemoFancy(hash string, memo *Memo, title_length int, content_length int, tag_length int) {
 	contents := Chunks(memo.Content, content_length)
 	titles := Chunks(memo.Title, title_length)
-	labels := Chunks(strings.Join(memo.Labels, ", "), label_length)
-	lines := int(math.Max(float64(len(contents)), math.Max(float64(len(titles)), float64(len(labels)))))
+	tags := Chunks(strings.Join(memo.Tags, ", "), tag_length)
+	lines := int(math.Max(float64(len(contents)), math.Max(float64(len(titles)), float64(len(tags)))))
 	for i := range lines {
 		if i == 0 {
 			fmt.Print(hash[0:8])
@@ -247,10 +247,10 @@ func (ui *Ui) PrintMemoFancy(hash string, memo *Memo, title_length int, content_
 
 		fmt.Print(strings.Repeat(" ", 4))
 
-		if len(labels) > i {
-			fmt.Printf("%-*s", label_length, labels[i])
+		if len(tags) > i {
+			fmt.Printf("%-*s", tag_length, tags[i])
 		} else {
-			fmt.Print(strings.Repeat(" ", label_length))
+			fmt.Print(strings.Repeat(" ", tag_length))
 		}
 
 		fmt.Println()
@@ -259,7 +259,7 @@ func (ui *Ui) PrintMemoFancy(hash string, memo *Memo, title_length int, content_
 
 func (ui *Ui) PrintMemo(hash string, memo *Memo) {
 	fmt.Printf("%s\t%s\t%s", hash[0:8], memo.Title, strings.ReplaceAll(memo.Content, "\n", "\\n"))
-	fmt.Printf("\t%s", strings.Join(memo.Labels, ", "))
+	fmt.Printf("\t%s", strings.Join(memo.Tags, ", "))
 }
 
 /************

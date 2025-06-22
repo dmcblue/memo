@@ -13,8 +13,8 @@ const (
 	APP_NAME   = "memo"
 	CMD_ADD    = "add"
 	CMD_EDIT   = "edit"
-	CMD_LABEL  = "label"
-	CMD_LABELS = "labels"
+	CMD_TAG    = "tag"
+	CMD_TAGS   = "tags"
 	CMD_LIST   = "ls"
 	CMD_REMOVE = "rm"
 	CMD_SHOW   = "show"
@@ -29,43 +29,43 @@ type HelpCommand struct {
 
 func help() {
 	message := []HelpCommand{
-		HelpCommand{
+		{
 			Text:    fmt.Sprintf("%s <COMMAND>", APP_NAME),
 			SubText: "",
 		},
-		HelpCommand{
+		{
 			Text:    fmt.Sprintf("%s %s <TITLE> (<CONTENTS>)", APP_NAME, CMD_ADD),
 			SubText: "Creates a new memo. If no CONTENTS is given, the system text editor will be opened for input.",
 		},
-		HelpCommand{
+		{
 			Text:    fmt.Sprintf("%s %s (-a/--accept) <IDENTIFIER> (<CONTENTS>)", APP_NAME, CMD_EDIT),
 			SubText: "Edits a memo. IDENTIFIER is either the memo title or the memo hash. If no CONTENTS is given, the system text editor will be opened for input. If the (-a/--accept) flag is provided, changes are auto-accepted. Otherwise, a diff will be presented for confirmation.",
 		},
-		HelpCommand{
-			Text:    fmt.Sprintf("%s %s (-n/--no-format) (...-l/--label <LABEL>)", APP_NAME, CMD_LIST),
-			SubText: "Prints memos. The (-n/--no-format) flag prints each memo as a single-line with its values tab-separated. Multiple (-l/--label) options can be used to limit the results by memos with ANY of the listed labels",
+		{
+			Text:    fmt.Sprintf("%s %s (-n/--no-format) (...-t/--tag <TAG>)", APP_NAME, CMD_LIST),
+			SubText: "Prints memos. The (-n/--no-format) flag prints each memo as a single-line with its values tab-separated. Multiple (-t/--tag) options can be used to limit the results by memos with ANY of the listed tags",
 		},
-		HelpCommand{
+		{
 			Text:    fmt.Sprintf("%s %s (-n/--no-format) <IDENTIFIER>", APP_NAME, CMD_SHOW),
 			SubText: "Prints a memo. IDENTIFIER is either the memo title or the memo hash. The (-n/--no-format) flag prints each memo as a single-line with its values tab-separated.",
 		},
-		HelpCommand{
-			Text:    fmt.Sprintf("%s %s %s <IDENTIFIER> <LABEL>", APP_NAME, CMD_LABEL, CMD_ADD),
-			SubText: "Adds a label/tag to a memo. IDENTIFIER is either the memo title or the memo hash.",
+		{
+			Text:    fmt.Sprintf("%s %s %s <IDENTIFIER> <TAG>", APP_NAME, CMD_TAG, CMD_ADD),
+			SubText: "Adds a tag to a memo. IDENTIFIER is either the memo title or the memo hash.",
 		},
-		HelpCommand{
-			Text:    fmt.Sprintf("%s %s %s", APP_NAME, CMD_LABEL, CMD_LIST),
-			SubText: "Lists all existing labels/tags",
+		{
+			Text:    fmt.Sprintf("%s %s %s", APP_NAME, CMD_TAG, CMD_LIST),
+			SubText: "Lists all existing tags",
 		},
-		HelpCommand{
-			Text:    fmt.Sprintf("%s %s", APP_NAME, CMD_LABELS),
-			SubText: fmt.Sprintf("Alias for `%s %s %s`", APP_NAME, CMD_LABEL, CMD_LIST),
+		{
+			Text:    fmt.Sprintf("%s %s", APP_NAME, CMD_TAGS),
+			SubText: fmt.Sprintf("Alias for `%s %s %s`", APP_NAME, CMD_TAG, CMD_LIST),
 		},
-		HelpCommand{
-			Text:    fmt.Sprintf("%s %s %s <IDENTIFIER> <LABEL>", APP_NAME, CMD_LABEL, CMD_REMOVE),
-			SubText: "Removes a label/tag to a memo. IDENTIFIER is either the memo title or the memo hash.",
+		{
+			Text:    fmt.Sprintf("%s %s %s <IDENTIFIER> <TAG>", APP_NAME, CMD_TAG, CMD_REMOVE),
+			SubText: "Removes a tag to a memo. IDENTIFIER is either the memo title or the memo hash.",
 		},
-		HelpCommand{
+		{
 			Text:    fmt.Sprintf("%s (%s/%s)", APP_NAME, HELP, HELP_SHORT),
 			SubText: "Prints this message.",
 		},
@@ -169,23 +169,23 @@ func main() {
 		AddMemo(ui, config)
 	case CMD_EDIT:
 		EditMemo(ui, config)
-	case CMD_LABEL:
+	case CMD_TAG:
 		if len(os.Args) < 3 {
 			cliError("No arguments given")
 		}
-		labelCommand := strings.TrimSpace(os.Args[2])
-		switch labelCommand {
+		tagCommand := strings.TrimSpace(os.Args[2])
+		switch tagCommand {
 		case CMD_ADD:
-			AddLabel(config)
+			AddTag(config)
 		case CMD_LIST:
-			ShowLabels(config)
+			ShowTags(config)
 		case CMD_REMOVE:
-			RemoveLabel(config)
+			RemoveTag(config)
 		default:
-			cliError(fmt.Sprintf("Unknown argument '%s'", command))
+			cliError(fmt.Sprintf("Unknown argument '%s'", tagCommand))
 		}
-	case CMD_LABELS:
-		ShowLabels(config)
+	case CMD_TAGS:
+		ShowTags(config)
 	case CMD_LIST:
 		ShowMemos(ui, config)
 	case CMD_SHOW:

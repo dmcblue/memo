@@ -42,10 +42,8 @@ func AddMemo(ui *Ui, config *Config) {
 		content = strings.TrimSpace(os.Args[3])
 	}
 	memo := CreateMemo(title, content)
-	err := memo.Save(config.SavesDir)
-	if err != nil {
-		fmt.Printf("ERRR %v\n", err)
-	}
+	hash := memo.Save(config.SavesDir)
+	fmt.Println(hash[0:8])
 }
 
 func EditMemo(ui *Ui, config *Config) {
@@ -149,33 +147,33 @@ func ShowMemo(ui *Ui, config *Config) {
 
 func ShowMemos(ui *Ui, config *Config) {
 	skip_formatting := false
-	search_labels_map := make(map[string]bool)
+	search_tags_map := make(map[string]bool)
 	for i := 2; i < len(os.Args); i++ {
 		arg := strings.TrimSpace(os.Args[i])
-		var label string
+		var tag string
 		if arg == "-n" || arg == "--no-format" {
 			skip_formatting = true
-		} else if arg == "-l" || arg == "--label" {
+		} else if arg == "-t" || arg == "--tag" {
 			if len(os.Args) < i+1 {
-				cliError("Invalid label search a")
+				cliError("Invalid tag search a")
 			}
-			label = strings.TrimSpace(os.Args[i+1])
-			if label != "-l" && label != "--label" {
-				search_labels_map[label] = true
+			tag = strings.TrimSpace(os.Args[i+1])
+			if tag != "-t" && tag != "--tag" {
+				search_tags_map[tag] = true
 				i++
 			} else {
-				cliError("Invalid label search")
+				cliError("Invalid tag search")
 			}
 		}
 	}
-	search_labels := []string{}
-	for s := range search_labels_map {
-		search_labels = append(search_labels, s)
+	search_tags := []string{}
+	for s := range search_tags_map {
+		search_tags = append(search_tags, s)
 	}
 	memos := LoadMemos(config.SavesDir)
 	memos_to_print := make(map[string]*Memo)
 	for hash, memo := range memos {
-		if len(search_labels) == 0 || AnyIntersection(search_labels, memo.Labels) {
+		if len(search_tags) == 0 || AnyIntersection(search_tags, memo.Tags) {
 			memos_to_print[hash] = memo
 		}
 	}
@@ -183,11 +181,11 @@ func ShowMemos(ui *Ui, config *Config) {
 	ui.PrintMemos(memos_to_print, skip_formatting)
 }
 
-/**********
- * Labels *
- **********/
+/********
+ * Tags *
+ ********/
 
-func AddLabel(config *Config) {
+func AddTag(config *Config) {
 	if len(os.Args) < 4 {
 		cliError("No memo hash")
 	}
@@ -197,14 +195,14 @@ func AddLabel(config *Config) {
 		cliError(fmt.Sprintf("No comment identifier '%s'", memo_hash))
 	}
 	if len(os.Args) < 5 {
-		cliError("No label")
+		cliError("No tag")
 	}
-	label := strings.TrimSpace(os.Args[4])
-	memo.Labels = append(memo.Labels, label)
+	tag := strings.TrimSpace(os.Args[4])
+	memo.Tags = append(memo.Tags, tag)
 	memo.Save(config.SavesDir)
 }
 
-func RemoveLabel(config *Config) {
+func RemoveTag(config *Config) {
 	if len(os.Args) < 4 {
 		cliError("No memo hash")
 	}
@@ -214,37 +212,37 @@ func RemoveLabel(config *Config) {
 		cliError(fmt.Sprintf("No comment identifier '%s'", memo_hash))
 	}
 	if len(os.Args) < 5 {
-		cliError("No label")
+		cliError("No tag")
 	}
-	label := strings.TrimSpace(os.Args[4])
+	tag := strings.TrimSpace(os.Args[4])
 	var i int
-	var found_label string
-	for i, found_label = range memo.Labels {
-		if found_label == label {
+	var found_tag string
+	for i, found_tag = range memo.Tags {
+		if found_tag == tag {
 			break
 		}
 	}
 
-	memo.Labels = append(memo.Labels[:i], memo.Labels[i+1:]...)
+	memo.Tags = append(memo.Tags[:i], memo.Tags[i+1:]...)
 	memo.Save(config.SavesDir)
 }
 
-func ShowLabels(config *Config) {
-	labels := make(map[string]bool)
+func ShowTags(config *Config) {
+	tags := make(map[string]bool)
 	memos := LoadMemos(config.SavesDir)
 	for _, memo := range memos {
-		for _, label := range memo.Labels {
-			labels[label] = true
+		for _, tag := range memo.Tags {
+			tags[tag] = true
 		}
 	}
 
-	all_labels := make([]string, 0)
-	for label := range labels {
-		all_labels = append(all_labels, label)
+	all_tags := make([]string, 0)
+	for tag := range tags {
+		all_tags = append(all_tags, tag)
 	}
 
-	sort.Strings(all_labels)
-	for _, label := range all_labels {
-		fmt.Println(label)
+	sort.Strings(all_tags)
+	for _, tag := range all_tags {
+		fmt.Println(tag)
 	}
 }
