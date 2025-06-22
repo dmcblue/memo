@@ -17,6 +17,7 @@ const (
 	CMD_TAGS   = "tags"
 	CMD_LIST   = "ls"
 	CMD_REMOVE = "rm"
+	CMD_SEARCH = "search"
 	CMD_SHOW   = "show"
 	HELP       = "--help"
 	HELP_SHORT = "-h"
@@ -46,12 +47,16 @@ func help() {
 			SubText: "Prints memos. The (-n/--no-format) flag prints each memo as a single-line with its values tab-separated. Multiple (-t/--tag) options can be used to limit the results by memos with ANY of the listed tags",
 		},
 		{
-			Text:    fmt.Sprintf("%s %s (-n/--no-format) <IDENTIFIER>", APP_NAME, CMD_SHOW),
-			SubText: "Prints a memo. IDENTIFIER is either the memo title or the memo hash. The (-n/--no-format) flag prints each memo as a single-line with its values tab-separated.",
-		},
-		{
 			Text:    fmt.Sprintf("%s %s <IDENTIFIER>", APP_NAME, CMD_REMOVE),
 			SubText: "Deletes a memo. IDENTIFIER is either the memo title or the memo hash.",
+		},
+		{
+			Text:    fmt.Sprintf("%s %s  (-t/--title OR -c/--content) (-n/--no-format) <SEARCH_TERM>", APP_NAME, CMD_SEARCH),
+			SubText: "Searches memos. The (-t/--title) limits the search to memo titles. The (-c/--content) limits the search to memo contents. You can only limit the search with one flag at a time. The (-n/--no-format) flag prints each memo as a single-line with its values tab-separated.",
+		},
+		{
+			Text:    fmt.Sprintf("%s %s (-n/--no-format) <IDENTIFIER>", APP_NAME, CMD_SHOW),
+			SubText: "Prints a memo. IDENTIFIER is either the memo title or the memo hash. The (-n/--no-format) flag prints each memo as a single-line with its values tab-separated.",
 		},
 		{
 			Text:    fmt.Sprintf("%s %s %s <IDENTIFIER> <TAG>", APP_NAME, CMD_TAG, CMD_ADD),
@@ -199,6 +204,8 @@ func main() {
 		}
 	case CMD_TAGS:
 		ShowTags(config)
+	case CMD_SEARCH:
+		SearchMemos(ui, config)
 	case CMD_LIST:
 		ShowMemos(ui, config)
 	case CMD_REMOVE:

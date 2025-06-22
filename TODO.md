@@ -13,7 +13,7 @@
   - [x] `memo tag add "tag" INDX`
   - [x] `memo tags`
   - [x] `memo tag rm "tag" INDX`
-  - [ ] `memo search [--title --content] search_term [--short --full]`
+  - [x] `memo search [--title --content] search_term [--short --full]`
   - [x] Editing
     -  `memo edit (INDX or title) [CONTENT]`
     - [x] Add edit diff

@@ -135,6 +135,46 @@ func RemoveMemo(ui *Ui, config *Config) {
 	memo_to_remove.Delete(config.SavesDir)
 }
 
+func SearchMemos(ui *Ui, config *Config) {
+	skip_formatting := false
+	search_term := ""
+	title_only := false
+	content_only := false
+	for i := 2; i < len(os.Args); i++ {
+		arg := strings.TrimSpace(os.Args[i])
+		if arg == "-n" || arg == "--no-format" {
+			skip_formatting = true
+		} else if arg == "-t" || arg == "--title" {
+			title_only = true
+		} else if arg == "-c" || arg == "--content" {
+			content_only = true
+		} else {
+			search_term = arg
+		}
+	}
+
+	memos := LoadMemos(config.SavesDir)
+	memos_to_print := make(map[string]*Memo)
+	for hash, memo := range memos {
+		if MemoMatchesSearch(search_term, memo, title_only, content_only) {
+			memos_to_print[hash] = memo
+		}
+	}
+
+	ui.PrintMemos(memos_to_print, skip_formatting)
+}
+
+func MemoMatchesSearch(search_term string, memo *Memo, title_only bool, content_only bool) bool {
+	if title_only {
+		return strings.Contains(strings.ToLower(memo.Title), strings.ToLower(search_term))
+	} else if content_only {
+		return strings.Contains(strings.ToLower(memo.Content), strings.ToLower(search_term))
+	}
+
+	return strings.Contains(strings.ToLower(memo.Title), strings.ToLower(search_term)) ||
+		strings.Contains(strings.ToLower(memo.Content), strings.ToLower(search_term))
+}
+
 func ShowMemo(ui *Ui, config *Config) {
 	skip_formatting := false
 	identifier := ""
