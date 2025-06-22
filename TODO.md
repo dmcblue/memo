@@ -16,7 +16,7 @@
   - [ ] `memo search [--title --content] search_term [--short --full]`
   - [x] Editing
     -  `memo edit (INDX or title) [CONTENT]`
-    - [ ] Add edit diff
+    - [x] Add edit diff
   - [x] Show single memo
   - [ ] Delete memo
 - [ ] Config
@@ -24,7 +24,7 @@
     - `~/.config`?
     - ENV VARS for save folder
 - [x] Help menu
-  - [ ] Chunk strings
+  - [x] Chunk strings
 - [ ] Convert saves_dir to app config
 - [ ] Change 'label' to 'tag'
 - [ ] ls, remove headers on no format

@@ -20,26 +20,73 @@ const (
 	HELP_SHORT = "-h"
 )
 
+type HelpCommand struct {
+	Text    string
+	SubText string
+}
+
 func help() {
-	fmt.Println(fmt.Sprintf("%s <COMMAND>", APP_NAME))
-	fmt.Println(fmt.Sprintf("%s %s <TITLE> (<CONTENTS>)", APP_NAME, CMD_ADD))
-	fmt.Println("\tCreates a new memo. If no CONTENTS is given, the system text editor will be opened for input.")
-	fmt.Println(fmt.Sprintf("%s %s (-a/--accept) <IDENTIFIER> (<CONTENTS>)", APP_NAME, CMD_EDIT))
-	fmt.Println("\tEdits a memo. IDENTIFIER is either the memo title or the memo hash. If no CONTENTS is given, the system text editor will be opened for input. If the (-a/--accept) flag is provided, changes are auto-accepted. Otherwise, a diff will be presented for confirmation.")
-	fmt.Println(fmt.Sprintf("%s %s (-n/--no-format) (...-l/--label <LABEL>)", APP_NAME, CMD_LIST))
-	fmt.Println("\tPrints memos. The (-n/--no-format) flag prints each memo as a single-line with its values tab-separated. Multiple (-l/--label) options can be used to limit the results by memos with ANY of the listed labels")
-	fmt.Println(fmt.Sprintf("%s %s (-n/--no-format) <IDENTIFIER>", APP_NAME, CMD_SHOW))
-	fmt.Println("\tPrints a memo. IDENTIFIER is either the memo title or the memo hash. The (-n/--no-format) flag prints each memo as a single-line with its values tab-separated.")
-	fmt.Println(fmt.Sprintf("%s %s %s <IDENTIFIER> <LABEL>", APP_NAME, CMD_LABEL, CMD_ADD))
-	fmt.Println("\tAdds a label/tag to a memo. IDENTIFIER is either the memo title or the memo hash.")
-	fmt.Println(fmt.Sprintf("%s %s %s", APP_NAME, CMD_LABEL, CMD_LIST))
-	fmt.Println("\tLists all existing labels/tags")
-	fmt.Println(fmt.Sprintf("%s %s", APP_NAME, CMD_LABELS))
-	fmt.Println(fmt.Sprintf("\tAlias for `%s %s %s`", APP_NAME, CMD_LABEL, CMD_LIST))
-	fmt.Println(fmt.Sprintf("%s %s %s <IDENTIFIER> <LABEL>", APP_NAME, CMD_LABEL, CMD_REMOVE))
-	fmt.Println("\tRemoves a label/tag to a memo. IDENTIFIER is either the memo title or the memo hash.")
-	fmt.Println(fmt.Sprintf("%s (%s/%s)", APP_NAME, HELP, HELP_SHORT))
-	fmt.Println("\tPrints this message.")
+	message := []HelpCommand{
+		HelpCommand{
+			Text:    fmt.Sprintf("%s <COMMAND>", APP_NAME),
+			SubText: "",
+		},
+		HelpCommand{
+			Text:    fmt.Sprintf("%s %s <TITLE> (<CONTENTS>)", APP_NAME, CMD_ADD),
+			SubText: "Creates a new memo. If no CONTENTS is given, the system text editor will be opened for input.",
+		},
+		HelpCommand{
+			Text:    fmt.Sprintf("%s %s (-a/--accept) <IDENTIFIER> (<CONTENTS>)", APP_NAME, CMD_EDIT),
+			SubText: "Edits a memo. IDENTIFIER is either the memo title or the memo hash. If no CONTENTS is given, the system text editor will be opened for input. If the (-a/--accept) flag is provided, changes are auto-accepted. Otherwise, a diff will be presented for confirmation.",
+		},
+		HelpCommand{
+			Text:    fmt.Sprintf("%s %s (-n/--no-format) (...-l/--label <LABEL>)", APP_NAME, CMD_LIST),
+			SubText: "Prints memos. The (-n/--no-format) flag prints each memo as a single-line with its values tab-separated. Multiple (-l/--label) options can be used to limit the results by memos with ANY of the listed labels",
+		},
+		HelpCommand{
+			Text:    fmt.Sprintf("%s %s (-n/--no-format) <IDENTIFIER>", APP_NAME, CMD_SHOW),
+			SubText: "Prints a memo. IDENTIFIER is either the memo title or the memo hash. The (-n/--no-format) flag prints each memo as a single-line with its values tab-separated.",
+		},
+		HelpCommand{
+			Text:    fmt.Sprintf("%s %s %s <IDENTIFIER> <LABEL>", APP_NAME, CMD_LABEL, CMD_ADD),
+			SubText: "Adds a label/tag to a memo. IDENTIFIER is either the memo title or the memo hash.",
+		},
+		HelpCommand{
+			Text:    fmt.Sprintf("%s %s %s", APP_NAME, CMD_LABEL, CMD_LIST),
+			SubText: "Lists all existing labels/tags",
+		},
+		HelpCommand{
+			Text:    fmt.Sprintf("%s %s", APP_NAME, CMD_LABELS),
+			SubText: fmt.Sprintf("Alias for `%s %s %s`", APP_NAME, CMD_LABEL, CMD_LIST),
+		},
+		HelpCommand{
+			Text:    fmt.Sprintf("%s %s %s <IDENTIFIER> <LABEL>", APP_NAME, CMD_LABEL, CMD_REMOVE),
+			SubText: "Removes a label/tag to a memo. IDENTIFIER is either the memo title or the memo hash.",
+		},
+		HelpCommand{
+			Text:    fmt.Sprintf("%s (%s/%s)", APP_NAME, HELP, HELP_SHORT),
+			SubText: "Prints this message.",
+		},
+	}
+
+	width := GetTermWidth()
+	if width == 0 {
+		for _, line := range message {
+			fmt.Println(line.Text)
+			fmt.Println("    " + line.SubText)
+		}
+	} else {
+		for _, line := range message {
+			textChunks := Chunks(line.Text, width-1)
+			subTextChunks := Chunks(line.SubText, width-5)
+			for _, t := range textChunks {
+				fmt.Println(t)
+			}
+			for _, s := range subTextChunks {
+				fmt.Println("    " + s)
+			}
+		}
+	}
 }
 
 func cliError(msg string, optional_error_status ...int) {
