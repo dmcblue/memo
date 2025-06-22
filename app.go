@@ -75,6 +75,42 @@ func EditMemo(ui *Ui) {
 	memo_to_edit.Save(saves_dir)
 }
 
+func ShowMemo(ui *Ui) {
+	skip_formatting := false
+	identifier := ""
+	for i := 2; i < len(os.Args); i++ {
+		arg := strings.TrimSpace(os.Args[i])
+		if arg == "-n" || arg == "--no-format" {
+			skip_formatting = true
+		} else {
+			identifier = arg
+		}
+	}
+
+	if identifier == "" {
+		cliError("No memo hash/title given")
+	}
+
+	memos := LoadMemos(saves_dir)
+	var memo_to_print *Memo = nil
+	var hash_to_print HASH = ""
+	for hash, memo := range memos {
+		if hash[0:8] == identifier || memo.Title == identifier {
+			hash_to_print = hash
+			memo_to_print = memo
+			break
+		}
+	}
+
+	if memo_to_print == nil {
+		cliError(fmt.Sprintf("Unknown memo identifier '%s'\n", identifier))
+	}
+	memos_to_print := make(map[string]*Memo)
+	memos_to_print[hash_to_print] = memo_to_print
+
+	ui.PrintMemos(memos_to_print, skip_formatting)
+}
+
 func ShowMemos(ui *Ui) {
 	skip_formatting := false
 	search_labels_map := make(map[string]bool)

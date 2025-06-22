@@ -65,6 +65,8 @@ func main() {
 		ShowLabels()
 	case "ls":
 		ShowMemos(ui)
+	case "show":
+		ShowMemo(ui)
 	default:
 		cliError(fmt.Sprintf("Unknown argument '%s'", command))
 	}

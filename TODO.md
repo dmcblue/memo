@@ -9,7 +9,7 @@
     - [x] Needs single line formatting
     - [x] Needs fancy/notfancy flag
     - [x] Tabs
-    - [ ] `memo ls --label "label" -l "label"`
+    - [x] `memo ls --label "label" -l "label"`
   - [x] `memo label add "label" INDX`
   - [x] `memo labels`
   - [x] `memo label rm "label" INDX`
@@ -17,7 +17,7 @@
   - [x] Editing
     -  `memo edit (INDX or title) [CONTENT]`
     - [ ] Add edit diff
-  - [ ] Show single memo
+  - [x] Show single memo
 - [ ] Config
     - .dotenv for env vars?
     - `~/.config`?
