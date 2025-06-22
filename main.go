@@ -10,17 +10,21 @@ import (
 )
 
 const (
-	APP_NAME   = "memo"
-	CMD_ADD    = "add"
-	CMD_EDIT   = "edit"
-	CMD_TAG    = "tag"
-	CMD_TAGS   = "tags"
-	CMD_LIST   = "ls"
-	CMD_REMOVE = "rm"
-	CMD_SEARCH = "search"
-	CMD_SHOW   = "show"
-	HELP       = "--help"
-	HELP_SHORT = "-h"
+	APP_NAME          = "memo"
+	CMD_ADD           = "add"
+	CMD_EDIT          = "edit"
+	CMD_TAG           = "tag"
+	CMD_TAGS          = "tags"
+	CMD_LIST          = "ls"
+	CMD_REMOVE        = "rm"
+	CMD_SEARCH        = "search"
+	CMD_SHOW          = "show"
+	CMD_VERSION       = "version"
+	CMD_VERSION_LONG  = "--version"
+	CMD_VERSION_SHORT = "-v"
+	HELP              = "--help"
+	HELP_SHORT        = "-h"
+	VERSION           = "1.0.0"
 )
 
 type HelpCommand struct {
@@ -75,6 +79,10 @@ func help() {
 			SubText: "Removes a tag to a memo. IDENTIFIER is either the memo title or the memo hash.",
 		},
 		{
+			Text:    fmt.Sprintf("%s (%s/%s/%s)", APP_NAME, CMD_VERSION, CMD_VERSION_LONG, CMD_VERSION_SHORT),
+			SubText: "Prints this current version.",
+		},
+		{
 			Text:    fmt.Sprintf("%s (%s/%s)", APP_NAME, HELP, HELP_SHORT),
 			SubText: "Prints this message.",
 		},
@@ -118,6 +126,10 @@ func dataError(msg string, optional_error_status ...int) {
 	}
 	fmt.Println(msg)
 	os.Exit(error_status)
+}
+
+func PrintVersion() {
+	fmt.Println(VERSION)
 }
 
 type Config struct {
@@ -212,6 +224,12 @@ func main() {
 		RemoveMemo(ui, config)
 	case CMD_SHOW:
 		ShowMemo(ui, config)
+	case CMD_VERSION:
+		PrintVersion()
+	case CMD_VERSION_LONG:
+		PrintVersion()
+	case CMD_VERSION_SHORT:
+		PrintVersion()
 	default:
 		cliError(fmt.Sprintf("Unknown argument '%s'", command))
 	}
