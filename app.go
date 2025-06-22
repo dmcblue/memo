@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/pmezard/go-difflib/difflib"
 )
 
 /*********
@@ -46,11 +48,24 @@ func AddMemo(ui *Ui) {
 }
 
 func EditMemo(ui *Ui) {
-	if len(os.Args) < 3 {
+	identifier := ""
+	new_content := ""
+	auto_accept := false
+	for i := 2; i < len(os.Args); i++ {
+		arg := strings.TrimSpace(os.Args[i])
+		if arg == "-a" || arg == "--accept" {
+			auto_accept = true
+		} else if identifier == "" {
+			identifier = arg
+		} else {
+			new_content = arg
+		}
+	}
+
+	if identifier == "" {
 		cliError("No memo hash/title given")
 	}
 
-	identifier := strings.TrimSpace(os.Args[2])
 	memos := LoadMemos(saves_dir)
 	var memo_to_edit *Memo = nil
 	for hash, memo := range memos {
@@ -64,11 +79,31 @@ func EditMemo(ui *Ui) {
 		cliError(fmt.Sprintf("Unknown memo identifier '%s'\n", identifier))
 	}
 
-	var new_content string
-	if len(os.Args) < 4 {
+	if new_content == "" {
 		new_content = ui.EditContent(memo_to_edit.Content)
-	} else {
-		new_content = strings.TrimSpace(os.Args[3])
+	}
+
+	if !auto_accept {
+		// Unmaintained package
+		diff := difflib.UnifiedDiff{
+			A:        difflib.SplitLines(memo_to_edit.Content),
+			B:        difflib.SplitLines(new_content),
+			FromFile: "Original",
+			ToFile:   "New",
+			Context:  3,
+		}
+		text, _ := difflib.GetUnifiedDiffString(diff)
+		fmt.Println(text)
+		fmt.Println("Changes:")
+		response := ui.GetResponse(
+			"Accept changes? (y/n) ",
+			"Try again: ",
+			[]string{"y", "n"},
+		)
+		if response == "n" {
+			fmt.Println("Changes scrapped")
+			return
+		}
 	}
 
 	memo_to_edit.Content = new_content
