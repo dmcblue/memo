@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"slices"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -155,37 +156,118 @@ func (ui *Ui) PrintMemos(memos map[string]*Memo) {
 	if width == 0 {
 		for hash, memo := range memos {
 			ui.PrintMemo(hash, memo)
+			fmt.Println()
 		}
 	} else {
+		// Assuming tab width == 4 for now
 		// sha 8 + 4 space + title + 4 space + content
 		var max_title_length float64 = 0
+		var max_content_length float64 = 0
 		var max_label_length float64 = 0
 		for _, memo := range memos {
 			max_title_length = math.Max(max_title_length, float64(len(memo.Title)))
+			max_content_length = math.Max(max_content_length, LongestOfMultiline(memo.Content))
 			for _, label := range memo.Labels {
 				max_label_length = math.Max(max_label_length, float64(len(label)))
 			}
 		}
-		title_length := (width - 20) / 3
+		title_memo := &Memo{
+			Title:   "TITLE",
+			Content: "CONTENT",
+			Labels:  []string{"LABELS"},
+		}
+		max_title_length = math.Max(max_title_length, float64(len(title_memo.Title)))
+		max_content_length = math.Max(max_content_length, LongestOfMultiline(title_memo.Content))
+		max_label_length = math.Max(max_label_length, float64(len(title_memo.Labels[0])))
+
+		title_length := int(math.Min(max_title_length, float64((width-20)/3)))
 		label_width := int(max_label_length)
-		content_length := width - 20 - title_length - label_width
-		for hash, memo := range memos {
+		content_length := int(math.Min(max_content_length, float64(width-20-title_length-label_width-1))) // 1 for right side padding
+		// If there's extra room, expand labels
+		label_width = width - content_length - 20 - title_length - 1
+		ui.PrintMemoFancy(
+			"HASH    ",
+			title_memo,
+			title_length,
+			content_length,
+			label_width,
+		)
+		fmt.Println()
+
+		hashes := make([]string, 0)
+		for hash, _ := range memos {
+			hashes = append(hashes, hash)
+		}
+
+		// Now sort the slice
+		sort.Strings(hashes)
+
+		// Iterate over all keys in a sorted order
+		for _, hash := range hashes {
+			// fmt.Printf("Key: %d, Value: %s\n", key, myMap[key])
+			// }
+			// for hash, memo := range memos {
+			memo := memos[hash]
 			ui.PrintMemoFancy(
 				hash,
 				memo,
 				title_length,
 				content_length,
-				content_length,
+				label_width,
 			)
+			fmt.Println()
 		}
 	}
 }
 
-func (ui *Ui) PrintMemoFancy(hash string, memo *Memo, title_length int, content_length int, label_length int) {
-	// contents := Chunks(memo.Content, content_length)
-	// titles := Chunks(memo.Title, title_length)
-	// labels := Chunks(strings.Join(memo.Labels, ", "), label_length)
+func LongestOfMultiline(str string) float64 {
+	lines := strings.Split(str, "\n")
+	var max_len float64 = 0
+	for _, line := range lines {
+		max_len = math.Max(max_len, float64(len(line)))
+	}
 
+	return max_len
+}
+
+func (ui *Ui) PrintMemoFancy(hash string, memo *Memo, title_length int, content_length int, label_length int) {
+	contents := Chunks(memo.Content, content_length)
+	titles := Chunks(memo.Title, title_length)
+	labels := Chunks(strings.Join(memo.Labels, ", "), label_length)
+	lines := int(math.Max(float64(len(contents)), math.Max(float64(len(titles)), float64(len(labels)))))
+	for i := range lines {
+		if i == 0 {
+			fmt.Print(hash[0:8])
+		} else {
+			fmt.Print(strings.Repeat(" ", 8))
+		}
+
+		fmt.Print(strings.Repeat(" ", 4))
+
+		if len(titles) > i {
+			fmt.Printf("%-*s", title_length, titles[i])
+		} else {
+			fmt.Print(strings.Repeat(" ", title_length))
+		}
+
+		fmt.Print(strings.Repeat(" ", 4))
+
+		if len(contents) > i {
+			fmt.Printf("%-*s", content_length, contents[i])
+		} else {
+			fmt.Print(strings.Repeat(" ", content_length))
+		}
+
+		fmt.Print(strings.Repeat(" ", 4))
+
+		if len(labels) > i {
+			fmt.Printf("%-*s", label_length, labels[i])
+		} else {
+			fmt.Print(strings.Repeat(" ", label_length))
+		}
+
+		fmt.Println()
+	}
 }
 
 func (ui *Ui) PrintMemo(hash string, memo *Memo) {
@@ -201,7 +283,6 @@ func (ui *Ui) PrintMemo(hash string, memo *Memo) {
 
 func GetTermWidth() int {
 	if term.IsTerminal(0) {
-		println("in a term")
 		width, _, err := term.GetSize(0)
 		if err != nil {
 			return 0
@@ -218,24 +299,29 @@ func Chunks(str string, chunkSize int) []string {
 	if len(str) == 0 {
 		return nil
 	}
-	if chunkSize >= len(str) {
-		return []string{str}
-	}
+
 	chunks := []string{}
-	// var chunks []string = make([]string, 0, (len(str)-1)/chunkSize+1)
-	// currentLen := 0
-	// currentStart := 0
-	strs := strings.Split(str, " ")
 	currentChunk := ""
-	for _, t := range strs {
-		if len(currentChunk)+1+len(t) > chunkSize {
-			chunks = append(chunks, currentChunk)
-			currentChunk = ""
-		} else {
-			currentChunk += " " + t
+
+	lines := strings.Split(str, "\n")
+	for _, line := range lines {
+
+		strs := strings.Split(line, " ")
+		for _, t := range strs {
+			if len(currentChunk)+1+len(t) > chunkSize {
+				chunks = append(chunks, currentChunk)
+				currentChunk = t
+			} else {
+				if currentChunk == "" {
+					currentChunk = t
+				} else {
+					currentChunk += " " + t
+				}
+			}
 		}
+		chunks = append(chunks, currentChunk)
+		currentChunk = ""
 	}
-	chunks = append(chunks, currentChunk)
 	// for i := range str {
 	// 	if currentLen == chunkSize {
 	// 		chunks = append(chunks, str[currentStart:i])

@@ -94,16 +94,18 @@ func ShowMemos(ui *Ui) {
 		}
 	}
 	search_labels := []string{}
-	for s, _ := range search_labels_map {
+	for s := range search_labels_map {
 		search_labels = append(search_labels, s)
 	}
 	memos := LoadMemos(saves_dir)
+	memos_to_print := make(map[string]*Memo)
 	for hash, memo := range memos {
 		if len(search_labels) == 0 || AnyIntersection(search_labels, memo.Labels) {
-			ui.PrintMemo(hash, memo)
-			fmt.Println("")
+			memos_to_print[hash] = memo
 		}
 	}
+
+	ui.PrintMemos(memos_to_print)
 }
 
 /**********
@@ -115,11 +117,14 @@ func AddLabel() {
 		cliError("No memo hash")
 	}
 	memo_hash := strings.TrimSpace(os.Args[3])
+	memo := LoadMemoByHash(saves_dir, memo_hash)
+	if memo == nil {
+		cliError(fmt.Sprintf("No comment identifier '%s'", memo_hash))
+	}
 	if len(os.Args) < 5 {
 		cliError("No label")
 	}
 	label := strings.TrimSpace(os.Args[4])
-	memo := LoadMemoByHash(saves_dir, memo_hash)
 	memo.Labels = append(memo.Labels, label)
 	memo.Save(saves_dir)
 }
@@ -129,11 +134,14 @@ func RemoveLabel() {
 		cliError("No memo hash")
 	}
 	memo_hash := strings.TrimSpace(os.Args[3])
+	memo := LoadMemoByHash(saves_dir, memo_hash)
+	if memo == nil {
+		cliError(fmt.Sprintf("No comment identifier '%s'", memo_hash))
+	}
 	if len(os.Args) < 5 {
 		cliError("No label")
 	}
 	label := strings.TrimSpace(os.Args[4])
-	memo := LoadMemoByHash(saves_dir, memo_hash)
 	var i int
 	var found_label string
 	for i, found_label = range memo.Labels {

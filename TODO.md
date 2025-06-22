@@ -5,6 +5,7 @@
     - [x] Should fail if title exists
   - [x] `memo add "Note Title"` with pipe editor
   - [x] `memo ls`
+    - [x] Fancy formatting
     - [ ] Needs single line formatting
     - [ ] Needs fancy/notfancy flag
     - [ ] `memo ls --label "label" -l "label"`
