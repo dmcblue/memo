@@ -50,6 +50,10 @@ func help() {
 			SubText: "Prints a memo. IDENTIFIER is either the memo title or the memo hash. The (-n/--no-format) flag prints each memo as a single-line with its values tab-separated.",
 		},
 		{
+			Text:    fmt.Sprintf("%s %s <IDENTIFIER>", APP_NAME, CMD_REMOVE),
+			SubText: "Deletes a memo. IDENTIFIER is either the memo title or the memo hash.",
+		},
+		{
 			Text:    fmt.Sprintf("%s %s %s <IDENTIFIER> <TAG>", APP_NAME, CMD_TAG, CMD_ADD),
 			SubText: "Adds a tag to a memo. IDENTIFIER is either the memo title or the memo hash.",
 		},
@@ -99,6 +103,15 @@ func cliError(msg string, optional_error_status ...int) {
 	fmt.Println(msg)
 	fmt.Println("")
 	help()
+	os.Exit(error_status)
+}
+
+func dataError(msg string, optional_error_status ...int) {
+	error_status := 1
+	if len(optional_error_status) > 0 && optional_error_status[0] != 0 {
+		error_status = optional_error_status[0]
+	}
+	fmt.Println(msg)
 	os.Exit(error_status)
 }
 
@@ -188,6 +201,8 @@ func main() {
 		ShowTags(config)
 	case CMD_LIST:
 		ShowMemos(ui, config)
+	case CMD_REMOVE:
+		RemoveMemo(ui, config)
 	case CMD_SHOW:
 		ShowMemo(ui, config)
 	default:

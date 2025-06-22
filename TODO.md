@@ -18,7 +18,7 @@
     -  `memo edit (INDX or title) [CONTENT]`
     - [x] Add edit diff
   - [x] Show single memo
-  - [ ] Delete memo
+  - [x] Delete memo
 - [x] Config
     - .dotenv for env vars?
     - `~/.config`?

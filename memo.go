@@ -28,6 +28,16 @@ func CreateMemo(title string, content string) *Memo {
 	}
 }
 
+func (memo *Memo) Delete(saves_dir string) {
+	filename := ToFilename(memo.Title, "")
+	fullpath := filepath.Join(
+		saves_dir,
+		filename,
+	)
+
+	os.Remove(fullpath)
+}
+
 func (memo *Memo) Save(saves_dir string) string {
 	filename := ToFilename(memo.Title, "")
 	fullpath := filepath.Join(

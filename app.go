@@ -75,7 +75,7 @@ func EditMemo(ui *Ui, config *Config) {
 	}
 
 	if memo_to_edit == nil {
-		cliError(fmt.Sprintf("Unknown memo identifier '%s'\n", identifier))
+		dataError(fmt.Sprintf("Unknown memo identifier '%s'\n", identifier))
 	}
 
 	if new_content == "" {
@@ -109,6 +109,32 @@ func EditMemo(ui *Ui, config *Config) {
 	memo_to_edit.Save(config.SavesDir)
 }
 
+func RemoveMemo(ui *Ui, config *Config) {
+	if len(os.Args) < 3 {
+		cliError("No memo identifier given")
+	}
+	identifier := strings.TrimSpace(os.Args[2])
+
+	if identifier == "" {
+		cliError("No memo hash/title given")
+	}
+
+	memos := LoadMemos(config.SavesDir)
+	var memo_to_remove *Memo = nil
+	for hash, memo := range memos {
+		if hash[0:8] == identifier || memo.Title == identifier {
+			memo_to_remove = memo
+			break
+		}
+	}
+
+	if memo_to_remove == nil {
+		dataError(fmt.Sprintf("Unknown memo identifier '%s'\n", identifier))
+	}
+
+	memo_to_remove.Delete(config.SavesDir)
+}
+
 func ShowMemo(ui *Ui, config *Config) {
 	skip_formatting := false
 	identifier := ""
@@ -137,7 +163,7 @@ func ShowMemo(ui *Ui, config *Config) {
 	}
 
 	if memo_to_print == nil {
-		cliError(fmt.Sprintf("Unknown memo identifier '%s'\n", identifier))
+		dataError(fmt.Sprintf("Unknown memo identifier '%s'\n", identifier))
 	}
 	memos_to_print := make(map[string]*Memo)
 	memos_to_print[hash_to_print] = memo_to_print
@@ -192,7 +218,7 @@ func AddTag(config *Config) {
 	memo_hash := strings.TrimSpace(os.Args[3])
 	memo := LoadMemoByHash(config.SavesDir, memo_hash)
 	if memo == nil {
-		cliError(fmt.Sprintf("No comment identifier '%s'", memo_hash))
+		dataError(fmt.Sprintf("No memo identifier '%s'", memo_hash))
 	}
 	if len(os.Args) < 5 {
 		cliError("No tag")
@@ -209,7 +235,7 @@ func RemoveTag(config *Config) {
 	memo_hash := strings.TrimSpace(os.Args[3])
 	memo := LoadMemoByHash(config.SavesDir, memo_hash)
 	if memo == nil {
-		cliError(fmt.Sprintf("No comment identifier '%s'", memo_hash))
+		dataError(fmt.Sprintf("No memo identifier '%s'", memo_hash))
 	}
 	if len(os.Args) < 5 {
 		cliError("No tag")
