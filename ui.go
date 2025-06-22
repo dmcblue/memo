@@ -150,10 +150,10 @@ func (ui *Ui) EditContent(fileContents string) string {
 	return string(content)
 }
 
-func (ui *Ui) PrintMemos(memos map[string]*Memo) {
+func (ui *Ui) PrintMemos(memos map[string]*Memo, skip_formatting bool) {
 	width := GetTermWidth()
 
-	if width == 0 {
+	if width == 0 || skip_formatting {
 		for hash, memo := range memos {
 			ui.PrintMemo(hash, memo)
 			fmt.Println()
@@ -195,7 +195,7 @@ func (ui *Ui) PrintMemos(memos map[string]*Memo) {
 		fmt.Println()
 
 		hashes := make([]string, 0)
-		for hash, _ := range memos {
+		for hash := range memos {
 			hashes = append(hashes, hash)
 		}
 
@@ -204,9 +204,6 @@ func (ui *Ui) PrintMemos(memos map[string]*Memo) {
 
 		// Iterate over all keys in a sorted order
 		for _, hash := range hashes {
-			// fmt.Printf("Key: %d, Value: %s\n", key, myMap[key])
-			// }
-			// for hash, memo := range memos {
 			memo := memos[hash]
 			ui.PrintMemoFancy(
 				hash,
@@ -218,16 +215,6 @@ func (ui *Ui) PrintMemos(memos map[string]*Memo) {
 			fmt.Println()
 		}
 	}
-}
-
-func LongestOfMultiline(str string) float64 {
-	lines := strings.Split(str, "\n")
-	var max_len float64 = 0
-	for _, line := range lines {
-		max_len = math.Max(max_len, float64(len(line)))
-	}
-
-	return max_len
 }
 
 func (ui *Ui) PrintMemoFancy(hash string, memo *Memo, title_length int, content_length int, label_length int) {
@@ -271,28 +258,13 @@ func (ui *Ui) PrintMemoFancy(hash string, memo *Memo, title_length int, content_
 }
 
 func (ui *Ui) PrintMemo(hash string, memo *Memo) {
-	fmt.Printf("%s\n%s\n%s\n", hash[0:8], memo.Title, memo.Content)
-	if len(memo.Labels) > 0 {
-		fmt.Println(strings.Join(memo.Labels, ", "))
-	}
+	fmt.Printf("%s\t%s\t%s", hash[0:8], memo.Title, strings.ReplaceAll(memo.Content, "\n", "\\n"))
+	fmt.Printf("\t%s", strings.Join(memo.Labels, ", "))
 }
 
 /************
  * UI Utils *
  ************/
-
-func GetTermWidth() int {
-	if term.IsTerminal(0) {
-		width, _, err := term.GetSize(0)
-		if err != nil {
-			return 0
-		}
-
-		return width
-	} else {
-		return 0
-	}
-}
 
 // https://stackoverflow.com/a/61469854
 func Chunks(str string, chunkSize int) []string {
@@ -322,14 +294,29 @@ func Chunks(str string, chunkSize int) []string {
 		chunks = append(chunks, currentChunk)
 		currentChunk = ""
 	}
-	// for i := range str {
-	// 	if currentLen == chunkSize {
-	// 		chunks = append(chunks, str[currentStart:i])
-	// 		currentLen = 0
-	// 		currentStart = i
-	// 	}
-	// 	currentLen++
-	// }
-	// chunks = append(chunks, str[currentStart:])
+
 	return chunks
+}
+
+func GetTermWidth() int {
+	if term.IsTerminal(0) {
+		width, _, err := term.GetSize(0)
+		if err != nil {
+			return 0
+		}
+
+		return width
+	} else {
+		return 0
+	}
+}
+
+func LongestOfMultiline(str string) float64 {
+	lines := strings.Split(str, "\n")
+	var max_len float64 = 0
+	for _, line := range lines {
+		max_len = math.Max(max_len, float64(len(line)))
+	}
+
+	return max_len
 }

@@ -76,11 +76,14 @@ func EditMemo(ui *Ui) {
 }
 
 func ShowMemos(ui *Ui) {
+	skip_formatting := false
 	search_labels_map := make(map[string]bool)
 	for i := 2; i < len(os.Args); i++ {
 		arg := strings.TrimSpace(os.Args[i])
 		var label string
-		if arg == "-l" || arg == "--label" {
+		if arg == "-n" || arg == "--no-format" {
+			skip_formatting = true
+		} else if arg == "-l" || arg == "--label" {
 			if len(os.Args) < i+1 {
 				cliError("Invalid label search a")
 			}
@@ -105,7 +108,7 @@ func ShowMemos(ui *Ui) {
 		}
 	}
 
-	ui.PrintMemos(memos_to_print)
+	ui.PrintMemos(memos_to_print, skip_formatting)
 }
 
 /**********

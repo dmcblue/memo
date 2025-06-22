@@ -6,8 +6,9 @@
   - [x] `memo add "Note Title"` with pipe editor
   - [x] `memo ls`
     - [x] Fancy formatting
-    - [ ] Needs single line formatting
-    - [ ] Needs fancy/notfancy flag
+    - [x] Needs single line formatting
+    - [x] Needs fancy/notfancy flag
+    - [x] Tabs
     - [ ] `memo ls --label "label" -l "label"`
   - [x] `memo label add "label" INDX`
   - [x] `memo labels`
