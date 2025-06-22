@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 
 	"github.com/pmezard/go-difflib/difflib"
@@ -236,7 +237,14 @@ func ShowLabels(config *Config) {
 			labels[label] = true
 		}
 	}
-	for label, _ := range labels {
+
+	all_labels := make([]string, 0)
+	for label := range labels {
+		all_labels = append(all_labels, label)
+	}
+
+	sort.Strings(all_labels)
+	for _, label := range all_labels {
 		fmt.Println(label)
 	}
 }

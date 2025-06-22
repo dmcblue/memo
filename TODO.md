@@ -29,5 +29,5 @@
   - [x] Chunk strings
 - [x] Convert saves_dir to app config
 - [ ] Change 'label' to 'tag'
-- [ ] ls, remove headers on no format
-- [ ] labels, sort results alphabetically
+- [x] ls, remove headers on no format
+- [x] labels, sort results alphabetically
