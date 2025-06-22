@@ -12,13 +12,13 @@ import (
  * Memos *
  *********/
 
-func AddMemo(ui *Ui) {
+func AddMemo(ui *Ui, config *Config) {
 	if len(os.Args) < 3 {
 		cliError("No memo title given")
 	}
 	title := strings.TrimSpace(os.Args[2])
 
-	memos := LoadMemos(saves_dir)
+	memos := LoadMemos(config.SavesDir)
 	for _, memo := range memos {
 		if memo.Title == title {
 			response := ui.GetResponse(
@@ -27,7 +27,7 @@ func AddMemo(ui *Ui) {
 				[]string{"y", "n"},
 			)
 			if response == "y" {
-				EditMemo(ui) // inefficient but simple
+				EditMemo(ui, config) // inefficient but simple
 			}
 
 			return
@@ -41,13 +41,13 @@ func AddMemo(ui *Ui) {
 		content = strings.TrimSpace(os.Args[3])
 	}
 	memo := CreateMemo(title, content)
-	err := memo.Save(saves_dir)
+	err := memo.Save(config.SavesDir)
 	if err != nil {
 		fmt.Printf("ERRR %v\n", err)
 	}
 }
 
-func EditMemo(ui *Ui) {
+func EditMemo(ui *Ui, config *Config) {
 	identifier := ""
 	new_content := ""
 	auto_accept := false
@@ -66,7 +66,7 @@ func EditMemo(ui *Ui) {
 		cliError("No memo hash/title given")
 	}
 
-	memos := LoadMemos(saves_dir)
+	memos := LoadMemos(config.SavesDir)
 	var memo_to_edit *Memo = nil
 	for hash, memo := range memos {
 		if hash[0:8] == identifier || memo.Title == identifier {
@@ -107,10 +107,10 @@ func EditMemo(ui *Ui) {
 	}
 
 	memo_to_edit.Content = new_content
-	memo_to_edit.Save(saves_dir)
+	memo_to_edit.Save(config.SavesDir)
 }
 
-func ShowMemo(ui *Ui) {
+func ShowMemo(ui *Ui, config *Config) {
 	skip_formatting := false
 	identifier := ""
 	for i := 2; i < len(os.Args); i++ {
@@ -126,7 +126,7 @@ func ShowMemo(ui *Ui) {
 		cliError("No memo hash/title given")
 	}
 
-	memos := LoadMemos(saves_dir)
+	memos := LoadMemos(config.SavesDir)
 	var memo_to_print *Memo = nil
 	var hash_to_print HASH = ""
 	for hash, memo := range memos {
@@ -146,7 +146,7 @@ func ShowMemo(ui *Ui) {
 	ui.PrintMemos(memos_to_print, skip_formatting)
 }
 
-func ShowMemos(ui *Ui) {
+func ShowMemos(ui *Ui, config *Config) {
 	skip_formatting := false
 	search_labels_map := make(map[string]bool)
 	for i := 2; i < len(os.Args); i++ {
@@ -171,7 +171,7 @@ func ShowMemos(ui *Ui) {
 	for s := range search_labels_map {
 		search_labels = append(search_labels, s)
 	}
-	memos := LoadMemos(saves_dir)
+	memos := LoadMemos(config.SavesDir)
 	memos_to_print := make(map[string]*Memo)
 	for hash, memo := range memos {
 		if len(search_labels) == 0 || AnyIntersection(search_labels, memo.Labels) {
@@ -186,12 +186,12 @@ func ShowMemos(ui *Ui) {
  * Labels *
  **********/
 
-func AddLabel() {
+func AddLabel(config *Config) {
 	if len(os.Args) < 4 {
 		cliError("No memo hash")
 	}
 	memo_hash := strings.TrimSpace(os.Args[3])
-	memo := LoadMemoByHash(saves_dir, memo_hash)
+	memo := LoadMemoByHash(config.SavesDir, memo_hash)
 	if memo == nil {
 		cliError(fmt.Sprintf("No comment identifier '%s'", memo_hash))
 	}
@@ -200,15 +200,15 @@ func AddLabel() {
 	}
 	label := strings.TrimSpace(os.Args[4])
 	memo.Labels = append(memo.Labels, label)
-	memo.Save(saves_dir)
+	memo.Save(config.SavesDir)
 }
 
-func RemoveLabel() {
+func RemoveLabel(config *Config) {
 	if len(os.Args) < 4 {
 		cliError("No memo hash")
 	}
 	memo_hash := strings.TrimSpace(os.Args[3])
-	memo := LoadMemoByHash(saves_dir, memo_hash)
+	memo := LoadMemoByHash(config.SavesDir, memo_hash)
 	if memo == nil {
 		cliError(fmt.Sprintf("No comment identifier '%s'", memo_hash))
 	}
@@ -225,12 +225,12 @@ func RemoveLabel() {
 	}
 
 	memo.Labels = append(memo.Labels[:i], memo.Labels[i+1:]...)
-	memo.Save(saves_dir)
+	memo.Save(config.SavesDir)
 }
 
-func ShowLabels() {
+func ShowLabels(config *Config) {
 	labels := make(map[string]bool)
-	memos := LoadMemos(saves_dir)
+	memos := LoadMemos(config.SavesDir)
 	for _, memo := range memos {
 		for _, label := range memo.Labels {
 			labels[label] = true

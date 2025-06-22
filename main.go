@@ -1,9 +1,11 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
+	"path"
 	"strings"
 )
 
@@ -100,17 +102,56 @@ func cliError(msg string, optional_error_status ...int) {
 	os.Exit(error_status)
 }
 
-var saves_dir string
+type Config struct {
+	SavesDir string
+}
+
+var config *Config
 var ui *Ui
 
-func init() {
-	saves_dir = strings.TrimSpace(os.Getenv("MEMO_SAVES_DIR"))
-	if strings.TrimSpace(saves_dir) == "" {
-		saves_dir = SAVES_DIR
+func LoadConfig() {
+	config_path := strings.TrimSpace(os.Getenv("MEMO_CONF_PATH"))
+	user_dir, _ := os.UserHomeDir()
+	user_config_dir, _ := os.UserConfigDir()
+	config_dir := strings.Replace(user_config_dir, "~", user_dir, 1)
+	if config_path == "" {
+		config_path = path.Join(config_dir, "memo.conf")
 	}
-	if err := os.MkdirAll(saves_dir, os.ModePerm); err != nil {
+
+	_, err := os.Stat(config_path)
+	if errors.Is(err, os.ErrNotExist) {
+		default_config := &Config{
+			SavesDir: path.Join(config_dir, "memo", "saves"),
+		}
+		if err := ToJson(default_config, config_path); err != nil {
+			log.Fatal(err)
+		}
+	} else if err != nil {
+		cliError(
+			"Unknown config access error\n" +
+				fmt.Sprintf("\tLoaded Config Path: '%s'\n", config_path) +
+				fmt.Sprintf("\tSystem Config Dir: '%s'\n", config_dir) +
+				fmt.Sprintf("\tMEMO_CONF_PATH: '%s'\n", os.Getenv("MEMO_CONF_PATH")) +
+				"Consider adjusting/unsetting MEMO_CONF_PATH\n\n" +
+				fmt.Sprintf("%v\n", config_path),
+		)
+	}
+
+	if err = FromJson(config, config_path); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func init() {
+	config = &Config{
+		SavesDir: "",
+	}
+	LoadConfig()
+
+	if err := os.MkdirAll(config.SavesDir, os.ModePerm); err != nil {
+		log.Fatal(err)
+	}
+
 	ui = CreateUi()
 }
 
@@ -125,9 +166,9 @@ func main() {
 	case HELP_SHORT:
 		help()
 	case CMD_ADD:
-		AddMemo(ui)
+		AddMemo(ui, config)
 	case CMD_EDIT:
-		EditMemo(ui)
+		EditMemo(ui, config)
 	case CMD_LABEL:
 		if len(os.Args) < 3 {
 			cliError("No arguments given")
@@ -135,20 +176,20 @@ func main() {
 		labelCommand := strings.TrimSpace(os.Args[2])
 		switch labelCommand {
 		case CMD_ADD:
-			AddLabel()
+			AddLabel(config)
 		case CMD_LIST:
-			ShowLabels()
+			ShowLabels(config)
 		case CMD_REMOVE:
-			RemoveLabel()
+			RemoveLabel(config)
 		default:
 			cliError(fmt.Sprintf("Unknown argument '%s'", command))
 		}
 	case CMD_LABELS:
-		ShowLabels()
+		ShowLabels(config)
 	case CMD_LIST:
-		ShowMemos(ui)
+		ShowMemos(ui, config)
 	case CMD_SHOW:
-		ShowMemo(ui)
+		ShowMemo(ui, config)
 	default:
 		cliError(fmt.Sprintf("Unknown argument '%s'", command))
 	}

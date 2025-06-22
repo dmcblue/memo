@@ -19,13 +19,15 @@
     - [x] Add edit diff
   - [x] Show single memo
   - [ ] Delete memo
-- [ ] Config
+- [x] Config
     - .dotenv for env vars?
     - `~/.config`?
     - ENV VARS for save folder
+    - I think making a config file with the saves folder as a variable is more
+      future proof.
 - [x] Help menu
   - [x] Chunk strings
-- [ ] Convert saves_dir to app config
+- [x] Convert saves_dir to app config
 - [ ] Change 'label' to 'tag'
 - [ ] ls, remove headers on no format
 - [ ] labels, sort results alphabetically

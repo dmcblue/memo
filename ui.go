@@ -280,15 +280,14 @@ func Chunks(str string, chunkSize int) []string {
 
 		strs := strings.Split(line, " ")
 		for _, t := range strs {
-			if len(currentChunk)+1+len(t) > chunkSize {
+
+			if currentChunk == "" {
+				currentChunk = t
+			} else if len(currentChunk)+1+len(t) > chunkSize {
 				chunks = append(chunks, currentChunk)
 				currentChunk = t
 			} else {
-				if currentChunk == "" {
-					currentChunk = t
-				} else {
-					currentChunk += " " + t
-				}
+				currentChunk += " " + t
 			}
 		}
 		chunks = append(chunks, currentChunk)
