@@ -1,5 +1,11 @@
 # memo
 
+## Application
+
+`memo` is a small application that records a 'Memo,' a small note with a title, for the user to read later.
+
+The user can tag memos to organize and search for them.
+
 ## Development
 
 ### Setup
