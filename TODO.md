@@ -18,9 +18,14 @@
     -  `memo edit (INDX or title) [CONTENT]`
     - [ ] Add edit diff
   - [x] Show single memo
+  - [ ] Delete memo
 - [ ] Config
     - .dotenv for env vars?
     - `~/.config`?
     - ENV VARS for save folder
-- [ ] Help menu
+- [x] Help menu
+  - [ ] Chunk strings
 - [ ] Convert saves_dir to app config
+- [ ] Change 'label' to 'tag'
+- [ ] ls, remove headers on no format
+- [ ] labels, sort results alphabetically

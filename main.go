@@ -7,8 +7,39 @@ import (
 	"strings"
 )
 
+const (
+	APP_NAME   = "memo"
+	CMD_ADD    = "add"
+	CMD_EDIT   = "edit"
+	CMD_LABEL  = "label"
+	CMD_LABELS = "labels"
+	CMD_LIST   = "ls"
+	CMD_REMOVE = "rm"
+	CMD_SHOW   = "show"
+	HELP       = "--help"
+	HELP_SHORT = "-h"
+)
+
 func help() {
-	fmt.Println("Help")
+	fmt.Println(fmt.Sprintf("%s <COMMAND>", APP_NAME))
+	fmt.Println(fmt.Sprintf("%s %s <TITLE> (<CONTENTS>)", APP_NAME, CMD_ADD))
+	fmt.Println("\tCreates a new memo. If no CONTENTS is given, the system text editor will be opened for input.")
+	fmt.Println(fmt.Sprintf("%s %s <IDENTIFIER> (<CONTENTS>)", APP_NAME, CMD_EDIT))
+	fmt.Println("\tEdits a memo. IDENTIFIER is either the memo title or the memo hash. If no CONTENTS is given, the system text editor will be opened for input.")
+	fmt.Println(fmt.Sprintf("%s %s (-n/--no-format) (...-l/--label <LABEL>)", APP_NAME, CMD_LIST))
+	fmt.Println("\tPrints memos. The (-n/--no-format) flag prints each memo as a single-line with its values tab-separated. Multiple (-l/--label) options can be used to limit the results by memos with ANY of the listed labels")
+	fmt.Println(fmt.Sprintf("%s %s (-n/--no-format) <IDENTIFIER>", APP_NAME, CMD_SHOW))
+	fmt.Println("\tPrints a memo. IDENTIFIER is either the memo title or the memo hash. The (-n/--no-format) flag prints each memo as a single-line with its values tab-separated.")
+	fmt.Println(fmt.Sprintf("%s %s %s <IDENTIFIER> <LABEL>", APP_NAME, CMD_LABEL, CMD_ADD))
+	fmt.Println("\tAdds a label/tag to a memo. IDENTIFIER is either the memo title or the memo hash.")
+	fmt.Println(fmt.Sprintf("%s %s %s", APP_NAME, CMD_LABEL, CMD_LIST))
+	fmt.Println("\tLists all existing labels/tags")
+	fmt.Println(fmt.Sprintf("%s %s", APP_NAME, CMD_LABELS))
+	fmt.Println(fmt.Sprintf("\tAlias for `%s %s %s`", APP_NAME, CMD_LABEL, CMD_LIST))
+	fmt.Println(fmt.Sprintf("%s %s %s <IDENTIFIER> <LABEL>", APP_NAME, CMD_LABEL, CMD_REMOVE))
+	fmt.Println("\tRemoves a label/tag to a memo. IDENTIFIER is either the memo title or the memo hash.")
+	fmt.Println(fmt.Sprintf("%s (%s/%s)", APP_NAME, HELP, HELP_SHORT))
+	fmt.Println("\tPrints this message.")
 }
 
 func cliError(msg string, optional_error_status ...int) {
@@ -42,30 +73,34 @@ func main() {
 	}
 	command := strings.TrimSpace(os.Args[1])
 	switch command {
-	case "add":
+	case HELP:
+		help()
+	case HELP_SHORT:
+		help()
+	case CMD_ADD:
 		AddMemo(ui)
-	case "edit":
+	case CMD_EDIT:
 		EditMemo(ui)
-	case "label":
+	case CMD_LABEL:
 		if len(os.Args) < 3 {
 			cliError("No arguments given")
 		}
 		labelCommand := strings.TrimSpace(os.Args[2])
 		switch labelCommand {
-		case "add":
+		case CMD_ADD:
 			AddLabel()
-		case "ls":
+		case CMD_LIST:
 			ShowLabels()
-		case "rm":
+		case CMD_REMOVE:
 			RemoveLabel()
 		default:
 			cliError(fmt.Sprintf("Unknown argument '%s'", command))
 		}
-	case "labels":
+	case CMD_LABELS:
 		ShowLabels()
-	case "ls":
+	case CMD_LIST:
 		ShowMemos(ui)
-	case "show":
+	case CMD_SHOW:
 		ShowMemo(ui)
 	default:
 		cliError(fmt.Sprintf("Unknown argument '%s'", command))
