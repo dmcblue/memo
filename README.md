@@ -21,7 +21,7 @@ HASH        TITLE                 CONTENT                          TAGS
 1031f355    Uncommit last set     git reset HEAD~                  git   
             of changes                                                   
 28533b79    Check for updates     please softwareupdate --list     macos 
-41778df4    Kill process using    kill                             system
+41778df4    Kill process using    kill $(lsof -t -i:3001)          system
             port                                                         
 46237b3d    Calculator            bc # quit to quit                tools 
 4804368e    Disk usage by file    du -m                                  
