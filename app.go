@@ -14,10 +14,29 @@ import (
  *********/
 
 func AddMemo(ui *Ui, config *Config) {
-	if len(os.Args) < 3 {
+	content := ""
+	title := ""
+	tags := []string{}
+	for i := 2; i < len(os.Args); i++ {
+		arg := strings.TrimSpace(os.Args[i])
+		if arg == "-t" || arg == "--tags" {
+			if i+1 == len(os.Args) {
+				cliError("No tags specified")
+			}
+			i++
+			tags = strings.Split(strings.TrimSpace(os.Args[i]), ",")
+		} else if title == "" {
+			title = arg
+		} else {
+			content = arg
+		}
+	}
+
+	if title == "" {
 		cliError("No memo title given")
 	}
-	title := strings.TrimSpace(os.Args[2])
+
+	// title := strings.TrimSpace(os.Args[2])
 
 	memos := LoadMemos(config.SavesDir)
 	for _, memo := range memos {
@@ -35,13 +54,15 @@ func AddMemo(ui *Ui, config *Config) {
 		}
 	}
 
-	var content string
-	if len(os.Args) < 4 {
+	// var content string
+	// if len(os.Args) < 4 {
+	if content == "" {
 		content = ui.EditContent("")
-	} else {
-		content = strings.TrimSpace(os.Args[3])
 	}
 	memo := CreateMemo(title, content)
+	for _, tag := range tags {
+		memo.Tags = append(memo.Tags, tag)
+	}
 	hash := memo.Save(config.SavesDir)
 	fmt.Println(hash[0:8])
 }

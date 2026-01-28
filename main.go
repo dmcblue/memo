@@ -39,8 +39,8 @@ func help() {
 			SubText: "",
 		},
 		{
-			Text:    fmt.Sprintf("%s %s <TITLE> (<CONTENTS>)", APP_NAME, CMD_ADD),
-			SubText: "Creates a new memo. If no CONTENTS is given, the system text editor will be opened for input.",
+			Text:    fmt.Sprintf("%s %s <TITLE> (<CONTENTS>) (-t/--tags <TAGS>)", APP_NAME, CMD_ADD),
+			SubText: "Creates a new memo. If no CONTENTS is given, the system text editor will be opened for input. TAGS is a comma separated list.",
 		},
 		{
 			Text:    fmt.Sprintf("%s %s (-a/--accept) <IDENTIFIER> (<CONTENTS>)", APP_NAME, CMD_EDIT),
