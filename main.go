@@ -24,7 +24,7 @@ const (
 	CMD_VERSION_SHORT = "-v"
 	HELP              = "--help"
 	HELP_SHORT        = "-h"
-	VERSION           = "1.0.0"
+	VERSION           = "1.1.0"
 )
 
 type HelpCommand struct {
